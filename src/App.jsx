@@ -20,6 +20,8 @@ import { AdminUsersPage }      from '@/pages/admin/users'
 import { AdminModerationPage } from '@/pages/admin/moderation'
 import { AdminCategoriesPage } from '@/pages/admin/categories'
 import { NotFoundPage }        from '@/pages/not-found'
+import { ProfilePage }         from '@/pages/profile'
+import { MyReviewsPage }       from '@/pages/my-reviews'
 
 export default function App() {
   return (
@@ -35,11 +37,13 @@ export default function App() {
             {/* Protected (requires auth) — all wrapped in Layout (Navbar + Outlet) */}
             <Route element={<RequireAuth><Layout /></RequireAuth>}>
               <Route index            element={<Catalogue />} />
+              <Route path="profil"    element={<ProfilePage />} />
               <Route path="ressources/:id" element={<ResourceDetail />} />
               <Route path="ressources/:id/modifier" element={<EditResourcePage />} />
               <Route path="categories/:id" element={<CategoryDetailPage />} />
               <Route path="favoris"   element={<FavoritesPage />} />
               <Route path="mes-contributions" element={<MyContributionsPage />} />
+              <Route path="mes-avis"    element={<MyReviewsPage />} />
               <Route path="contribuer"  element={<SubmitResourcePage />} />
               <Route path="historique"  element={<MyHistoryPage />} />
 

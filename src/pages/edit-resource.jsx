@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link, useParams } from 'react-router-dom'
-import { Edit, ArrowLeft } from 'lucide-react'
+import { Edit, ArrowLeft, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
@@ -24,8 +24,44 @@ export function EditResourcePage() {
   const [initialLoading, setInitialLoading] = useState(true)
   const [initialError, setInitialError]     = useState('')
   const [loading, setLoading]               = useState(false)
+  const [aiTitleLoading, setAiTitleLoading] = useState(false)
+  const [aiDescLoading, setAiDescLoading]   = useState(false)
   const [errors, setErrors]                 = useState({})
   const [globalErr, setGlobalErr]           = useState('')
+
+  async function generateAiTitle() {
+    setAiTitleLoading(true)
+    try {
+      const res = await api.post(`/resources/${id}/generate-description`)
+      if (res && res.title) {
+        set('title', res.title)
+        toast.success("Titre généré par l'IA.")
+      } else {
+        toast.error("L'IA n'a pas pu déterminer un titre pour ce document.")
+      }
+    } catch (err) {
+      toast.error(err.message || 'Erreur lors de la génération.')
+    } finally {
+      setAiTitleLoading(false)
+    }
+  }
+
+  async function generateAiDescription() {
+    setAiDescLoading(true)
+    try {
+      const res = await api.post(`/resources/${id}/generate-description`)
+      if (res && res.summary) {
+        set('description', res.summary)
+        toast.success("Description générée par l'IA.")
+      } else {
+        toast.error("L'IA n'a pas pu déterminer une description.")
+      }
+    } catch (err) {
+      toast.error(err.message || 'Erreur lors de la génération.')
+    } finally {
+      setAiDescLoading(false)
+    }
+  }
 
   useEffect(() => {
     async function load() {
@@ -139,21 +175,34 @@ export function EditResourcePage() {
       <form onSubmit={onSubmit} noValidate className="space-y-5">
         <div className="rounded-xl border border-border bg-card p-6 space-y-5">
           <div>
-            <label htmlFor="sr-title" className="mb-1.5 block text-sm font-medium text-foreground">Titre <span className="text-destructive">*</span></label>
-            <Input id="sr-title" type="text" value={form.title} onChange={e => set('title', e.target.value)} aria-invalid={!!errors.title} required />
+            <div className="mb-1.5 flex items-center justify-between">
+              <label htmlFor="sr-title" className="block text-sm font-medium text-foreground">Titre <span className="text-destructive">*</span></label>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm" 
+                className="h-7 text-xs gap-1.5" 
+                onClick={generateAiTitle}
+                disabled={aiTitleLoading}
+              >
+                <Sparkles className="size-3" />
+                {aiTitleLoading ? 'Génération…' : "Générer avec l'IA"}
+              </Button>
+            </div>
+            <Input id="sr-title" type="text" value={form.title} onChange={e => set('title', e.target.value)} aria-invalid={!!errors.title} required disabled={aiTitleLoading} />
             <FieldError message={errors.title} />
           </div>
 
           <div>
             <label htmlFor="sr-authors" className="mb-1.5 block text-sm font-medium text-foreground">Auteur(s)</label>
-            <Input id="sr-authors" type="text" value={form.authors} onChange={e => set('authors', e.target.value)} aria-invalid={!!errors.authors} />
+            <Input id="sr-authors" type="text" value={form.authors} onChange={e => set('authors', e.target.value)} aria-invalid={!!errors.authors} disabled={aiTitleLoading || aiDescLoading} />
             <FieldError message={errors.authors} />
           </div>
 
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
               <label htmlFor="sr-category" className="mb-1.5 block text-sm font-medium text-foreground">Catégorie <span className="text-destructive">*</span></label>
-              <Select id="sr-category" value={form.category_id} onChange={e => set('category_id', e.target.value)} aria-invalid={!!errors.category_id} required>
+              <Select id="sr-category" value={form.category_id} onChange={e => set('category_id', e.target.value)} aria-invalid={!!errors.category_id} required disabled={aiTitleLoading || aiDescLoading}>
                 <option value="">Sélectionner…</option>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </Select>
@@ -161,7 +210,7 @@ export function EditResourcePage() {
             </div>
             <div>
               <label htmlFor="sr-language" className="mb-1.5 block text-sm font-medium text-foreground">Langue</label>
-              <Select id="sr-language" value={form.language} onChange={e => set('language', e.target.value)}>
+              <Select id="sr-language" value={form.language} onChange={e => set('language', e.target.value)} disabled={aiTitleLoading || aiDescLoading}>
                 <option value="">Sélectionner…</option>
                 {['Français','Anglais','Arabe','Espagnol','Allemand'].map(l => <option key={l} value={l}>{l}</option>)}
               </Select>
@@ -170,12 +219,25 @@ export function EditResourcePage() {
 
           <div>
             <label htmlFor="sr-date" className="mb-1.5 block text-sm font-medium text-foreground">Date de publication</label>
-            <Input id="sr-date" type="date" value={form.publication_date} onChange={e => set('publication_date', e.target.value)} />
+            <Input id="sr-date" type="date" value={form.publication_date} onChange={e => set('publication_date', e.target.value)} disabled={aiTitleLoading || aiDescLoading} />
           </div>
 
           <div>
-            <label htmlFor="sr-description" className="mb-1.5 block text-sm font-medium text-foreground">Description</label>
-            <Textarea id="sr-description" rows={4} value={form.description} onChange={e => set('description', e.target.value)} />
+            <div className="mb-1.5 flex items-center justify-between">
+              <label htmlFor="sr-description" className="block text-sm font-medium text-foreground">Description</label>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm" 
+                className="h-7 text-xs gap-1.5" 
+                onClick={generateAiDescription}
+                disabled={aiDescLoading}
+              >
+                <Sparkles className="size-3" />
+                {aiDescLoading ? 'Génération…' : "Générer avec l'IA"}
+              </Button>
+            </div>
+            <Textarea id="sr-description" rows={4} value={form.description} onChange={e => set('description', e.target.value)} disabled={aiDescLoading} />
           </div>
         </div>
 

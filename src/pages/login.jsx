@@ -1,13 +1,20 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { BookOpen, Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '@/contexts/auth-context'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
+import { AlertCircle } from 'lucide-react'
+
 function FieldError({ message }) {
   if (!message) return null
-  return <p className="mt-1.5 text-xs text-destructive">{message}</p>
+  return (
+    <p className="mt-1.5 flex items-center gap-1 text-[0.8rem] font-medium text-destructive">
+      <AlertCircle className="size-3.5" />
+      {message}
+    </p>
+  )
 }
 
 export function LoginPage() {
@@ -45,8 +52,21 @@ export function LoginPage() {
     } catch (err) {
       if (err.status === 422 && err.errors) {
         const flat = {}
-        Object.entries(err.errors).forEach(([k, v]) => { flat[k] = v[0] })
+        let promotedGlobal = false
+        Object.entries(err.errors).forEach(([k, v]) => { 
+          // Laravel auth failure usually returns an error on the 'email' field
+          if (k === 'email' && typeof v[0] === 'string' && v[0].toLowerCase().includes('identifiants')) {
+            setGlobalErr(v[0])
+            promotedGlobal = true
+          } else {
+            flat[k] = v[0] 
+          }
+        })
         setErrors(flat)
+        // If we only had the promoted global error, clear field errors
+        if (promotedGlobal && Object.keys(flat).length === 0) {
+           setErrors({})
+        }
       } else {
         setGlobalErr(err.message ?? 'Identifiants invalides.')
       }
@@ -58,11 +78,14 @@ export function LoginPage() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-4 py-12">
       {/* Logo */}
-      <Link to="/" className="mb-8 flex flex-col items-center gap-2">
-        <span className="inline-flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-          <BookOpen className="size-6" aria-hidden="true" />
+      <Link to="/" aria-label="Biblia - accueil" className="group mb-9 flex flex-col items-center gap-2">
+        <span className="font-serif text-5xl font-bold leading-none text-foreground transition-colors group-hover:text-primary">
+          <span className="text-primary">B</span>iblia
         </span>
-        <span className="text-sm font-semibold text-foreground">Bibliothèque Digitale</span>
+        <span className="flex items-center gap-2 text-[0.65rem] font-semibold uppercase text-muted-foreground">
+          <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
+          Savoirs en partage
+        </span>
       </Link>
 
       <div className="w-full max-w-sm">
@@ -75,8 +98,9 @@ export function LoginPage() {
           </p>
 
           {globalErr && (
-            <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {globalErr}
+            <div className="mb-6 flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              <AlertCircle className="mt-0.5 size-4 shrink-0" />
+              <p className="font-medium">{globalErr}</p>
             </div>
           )}
 

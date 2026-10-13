@@ -27,25 +27,46 @@ export function SubmitResourcePage() {
   const [loading, setLoading]       = useState(false)
   const [success, setSuccess]       = useState(false)
   const [dragOver, setDragOver]     = useState(false)
-  const [aiLoading, setAiLoading]   = useState(false)
+  const [aiTitleLoading, setAiTitleLoading] = useState(false)
+  const [aiDescLoading, setAiDescLoading]   = useState(false)
 
-  async function generateAiDescription() {
-    if (!form.file) {
-      toast.error("Veuillez d'abord sélectionner un fichier.")
-      return
-    }
-    setAiLoading(true)
+  async function generateAiTitle() {
+    if (!form.file) { toast.error("Veuillez d'abord sélectionner un fichier."); return }
+    setAiTitleLoading(true)
     const formData = new FormData()
     formData.append('file', form.file)
     try {
       const res = await api.post('/resources/generate-description', formData)
-      if (res?.summary) {
+      if (res && res.title) {
+        set('title', res.title)
+        toast.success("Titre généré par l'IA.")
+      } else {
+        toast.error("L'IA n'a pas pu déterminer un titre.")
+      }
+    } catch (err) {
+      toast.error(err.message || "Erreur lors de la génération du titre.")
+    } finally {
+      setAiTitleLoading(false)
+    }
+  }
+
+  async function generateAiDescription() {
+    if (!form.file) { toast.error("Veuillez d'abord sélectionner un fichier."); return }
+    setAiDescLoading(true)
+    const formData = new FormData()
+    formData.append('file', form.file)
+    try {
+      const res = await api.post('/resources/generate-description', formData)
+      if (res && res.summary) {
         set('description', res.summary)
+        toast.success("Description générée par l'IA.")
+      } else {
+        toast.error("L'IA n'a pas pu déterminer une description.")
       }
     } catch (err) {
       toast.error(err.message || 'Erreur lors de la génération de la description.')
     } finally {
-      setAiLoading(false)
+      setAiDescLoading(false)
     }
   }
 
@@ -136,8 +157,21 @@ export function SubmitResourcePage() {
       <form onSubmit={onSubmit} noValidate className="space-y-5">
         <div className="rounded-xl border border-border bg-card p-6 space-y-5">
           <div>
-            <label htmlFor="sr-title" className="mb-1.5 block text-sm font-medium text-foreground">Titre <span className="text-destructive">*</span></label>
-            <Input id="sr-title" type="text" placeholder="Titre du document" value={form.title} onChange={e => set('title', e.target.value)} aria-invalid={!!errors.title} required />
+            <div className="mb-1.5 flex items-center justify-between">
+              <label htmlFor="sr-title" className="block text-sm font-medium text-foreground">Titre <span className="text-destructive">*</span></label>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm" 
+                className="h-7 text-xs gap-1.5" 
+                onClick={generateAiTitle}
+                disabled={aiTitleLoading}
+              >
+                <Sparkles className="size-3" />
+                {aiTitleLoading ? 'Génération…' : "Générer avec l'IA"}
+              </Button>
+            </div>
+            <Input id="sr-title" type="text" placeholder="Titre du document" value={form.title} onChange={e => set('title', e.target.value)} aria-invalid={!!errors.title} required disabled={aiTitleLoading} />
             <FieldError message={errors.title} />
           </div>
 
@@ -179,13 +213,13 @@ export function SubmitResourcePage() {
                 size="sm" 
                 className="h-7 text-xs gap-1.5" 
                 onClick={generateAiDescription}
-                disabled={aiLoading}
+                disabled={aiDescLoading}
               >
                 <Sparkles className="size-3" />
-                {aiLoading ? 'Génération…' : "Générer avec l'IA"}
+                {aiDescLoading ? 'Génération…' : "Générer avec l'IA"}
               </Button>
             </div>
-            <Textarea id="sr-description" rows={4} placeholder="Décrivez brièvement le contenu…" value={form.description} onChange={e => set('description', e.target.value)} disabled={aiLoading} />
+            <Textarea id="sr-description" rows={4} placeholder="Décrivez brièvement le contenu…" value={form.description} onChange={e => set('description', e.target.value)} disabled={aiDescLoading} />
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { BookOpen, Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuth } from '@/contexts/auth-context'
 import { Button } from '@/components/ui/button'
@@ -62,11 +62,8 @@ export function RegisterPage() {
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-4 py-12">
-      <Link to="/" className="mb-8 flex flex-col items-center gap-2">
-        <span className="inline-flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-          <BookOpen className="size-6" aria-hidden="true" />
-        </span>
-        <span className="text-sm font-semibold text-foreground">Bibliothèque Digitale</span>
+      <Link to="/" className="mb-8 text-2xl font-semibold text-foreground">
+        Biblia
       </Link>
 
       <div className="w-full max-w-sm">

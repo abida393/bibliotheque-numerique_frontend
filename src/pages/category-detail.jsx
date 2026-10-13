@@ -16,7 +16,7 @@ export function CategoryDetailPage() {
   const [error, setError] = useState(null)
 
   const [page, setPage] = useState(1)
-  const { items: resources, meta, loading: loadingRes } = usePaginated('/resources', { category_id: id, per_page: 20, page })
+  const { items: resources, meta, loading: loadingRes } = usePaginated('/resources', { category_id: id, per_page: 9, page })
 
   useEffect(() => {
     async function load() {

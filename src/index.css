@@ -167,3 +167,205 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+.logout-confirmation-backdrop {
+  background: rgb(15 23 42 / 55%);
+  backdrop-filter: none;
+}
+
+.logout-confirmation.swal2-popup {
+  width: min(27rem, calc(100vw - 2rem));
+  padding: 1.375rem;
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: 0 24px 70px rgb(0 0 0 / 30%);
+}
+
+.logout-confirmation .swal2-title {
+  margin: 0;
+  padding: 0.125rem 2rem 0 0;
+  color: var(--foreground);
+  text-align: left;
+}
+
+.logout-confirmation-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.logout-confirmation-icon {
+  display: inline-flex;
+  width: 3rem;
+  height: 3rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in oklab, var(--destructive) 20%, var(--border));
+  border-radius: 0.75rem;
+  background: color-mix(in oklab, var(--destructive) 10%, var(--card));
+  color: var(--destructive);
+}
+
+.logout-confirmation-title-copy {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.logout-confirmation-eyebrow {
+  color: var(--muted-foreground);
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.logout-confirmation-title-text {
+  color: var(--foreground);
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.logout-confirmation-html {
+  margin: 0;
+  padding: 1.125rem 0 0;
+  color: var(--muted-foreground);
+  text-align: left;
+}
+
+.logout-confirmation-account {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.625rem;
+  background: color-mix(in oklab, var(--muted) 70%, var(--card));
+  color: var(--foreground);
+}
+
+.logout-confirmation-avatar {
+  display: inline-flex;
+  width: 2.375rem;
+  height: 2.375rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.logout-confirmation-account-copy {
+  min-width: 0;
+}
+
+.logout-confirmation-account-name,
+.logout-confirmation-account-email {
+  overflow: hidden;
+  margin: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logout-confirmation-account-name {
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+.logout-confirmation-account-email {
+  margin-top: 0.2rem;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+.logout-confirmation-session {
+  margin-left: auto;
+  flex: 0 0 auto;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--primary) 10%, var(--card));
+  padding: 0.3rem 0.55rem;
+  color: var(--primary);
+  font-size: 0.625rem;
+  font-weight: 650;
+}
+
+.logout-confirmation-message {
+  margin: 0 0 1rem;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.logout-confirmation .swal2-close {
+  color: var(--muted-foreground);
+}
+
+.logout-confirmation .swal2-close:hover {
+  color: var(--foreground);
+}
+
+.logout-confirmation .swal2-actions {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1.25rem 0 0;
+}
+
+.logout-confirmation .swal2-confirm,
+.logout-confirmation .swal2-cancel {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0.625rem 1rem;
+  border-radius: 0.625rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.logout-confirmation .swal2-confirm {
+  border: 1px solid var(--destructive);
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+}
+
+.logout-confirmation .swal2-confirm:hover {
+  border-color: color-mix(in oklab, var(--destructive) 88%, black);
+  background: color-mix(in oklab, var(--destructive) 88%, black);
+}
+
+.logout-confirmation .swal2-cancel {
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.logout-confirmation .swal2-cancel:hover {
+  background: var(--muted);
+}
+
+.logout-confirmation .swal2-confirm:focus-visible,
+.logout-confirmation .swal2-cancel:focus-visible,
+.logout-confirmation .swal2-close:focus-visible {
+  outline: 3px solid color-mix(in oklab, var(--ring) 45%, transparent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .logout-confirmation.swal2-popup {
+    padding: 1.125rem;
+  }
+
+  .logout-confirmation-session {
+    display: none;
+  }
+}

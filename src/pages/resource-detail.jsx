@@ -144,6 +144,7 @@ export function ResourceDetail() {
     setSubmitting(true)
     setReviewError('')
     try {
+      const res = await api.post(`/resources/${id}/reviews`, reviewForm)
       setReviews(prev => {
         const newReviews = [res.data, ...prev]
         setResource(r => ({
@@ -230,14 +231,16 @@ export function ResourceDetail() {
                 </div>
               )}
             </div>
-            <button
-              onClick={() => toggle(resource.id)}
-              aria-pressed={isFav}
-              aria-label={isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}
-              className={cn('shrink-0 inline-flex size-10 items-center justify-center rounded-xl border border-transparent transition-colors hover:bg-muted', isFav ? 'text-red-500' : 'text-muted-foreground')}
-            >
-              <Heart className={cn('size-5 transition-all', isFav && 'fill-red-500')} />
-            </button>
+            {resource.status === 'validated' && (
+              <button
+                onClick={() => toggle(resource.id)}
+                aria-pressed={isFav}
+                aria-label={isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                className={cn('shrink-0 inline-flex size-10 items-center justify-center rounded-xl border border-transparent transition-colors hover:bg-muted', isFav ? 'text-red-500' : 'text-muted-foreground')}
+              >
+                <Heart className={cn('size-5 transition-all', isFav && 'fill-red-500')} />
+              </button>
+            )}
           </div>
 
           {/* Action buttons (Edit/Delete) */}
@@ -286,47 +289,49 @@ export function ResourceDetail() {
           )}
 
           {/* Reviews */}
-          <div className="mt-8">
-            <h2 className="mb-4 text-base font-semibold text-foreground">
-              Avis ({resource.reviews_count ?? reviews.length})
-            </h2>
+          {resource.status === 'validated' && (
+            <div className="mt-8">
+              <h2 className="mb-4 text-base font-semibold text-foreground">
+                Avis ({resource.reviews_count ?? reviews.length})
+              </h2>
 
-            {/* Add review */}
-            {!hasReviewed && (
-              <form onSubmit={submitReview} className="mb-6 rounded-xl border border-border bg-card p-5">
-                <h3 className="mb-3 text-sm font-medium text-foreground">Laisser un avis</h3>
-                <div className="mb-3 flex gap-1">
-                  {[1,2,3,4,5].map(n => (
-                    <button key={n} type="button" onClick={() => setReviewForm(f => ({ ...f, rating: n }))}
-                      className="text-amber-400 hover:scale-110 transition-transform"
-                      aria-label={`${n} étoile${n > 1 ? 's' : ''}`}>
-                      <Star className={cn('size-6', n <= reviewForm.rating ? 'fill-amber-400' : 'fill-transparent')} />
-                    </button>
+              {/* Add review */}
+              {!hasReviewed && user?.id !== resource.author_user?.id && (
+                <form onSubmit={submitReview} className="mb-6 rounded-xl border border-border bg-card p-5">
+                  <h3 className="mb-3 text-sm font-medium text-foreground">Laisser un avis</h3>
+                  <div className="mb-3 flex gap-1">
+                    {[1,2,3,4,5].map(n => (
+                      <button key={n} type="button" onClick={() => setReviewForm(f => ({ ...f, rating: n }))}
+                        className="text-amber-400 hover:scale-110 transition-transform"
+                        aria-label={`${n} étoile${n > 1 ? 's' : ''}`}>
+                        <Star className={cn('size-6', n <= reviewForm.rating ? 'fill-amber-400' : 'fill-transparent')} />
+                      </button>
+                    ))}
+                  </div>
+                  <Textarea
+                    placeholder="Partagez votre avis sur ce document… (facultatif)"
+                    value={reviewForm.comment}
+                    onChange={e => setReviewForm(f => ({ ...f, comment: e.target.value }))}
+                    rows={3}
+                  />
+                  {reviewError && <p className="mt-2 text-xs text-destructive">{reviewError}</p>}
+                  <Button type="submit" size="lg" className="mt-3" disabled={submitting}>
+                    {submitting ? 'Envoi…' : 'Publier mon avis'}
+                  </Button>
+                </form>
+              )}
+
+              {reviews.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Aucun avis pour le moment. Soyez le premier !</p>
+              ) : (
+                <div className="rounded-xl border border-border bg-card px-5">
+                  {reviews.map(r => (
+                    <ReviewItem key={r.id} review={r} onDelete={deleteReview} currentUserId={user?.id} isModerator={isModerator} />
                   ))}
                 </div>
-                <Textarea
-                  placeholder="Partagez votre avis sur ce document… (facultatif)"
-                  value={reviewForm.comment}
-                  onChange={e => setReviewForm(f => ({ ...f, comment: e.target.value }))}
-                  rows={3}
-                />
-                {reviewError && <p className="mt-2 text-xs text-destructive">{reviewError}</p>}
-                <Button type="submit" size="lg" className="mt-3" disabled={submitting}>
-                  {submitting ? 'Envoi…' : 'Publier mon avis'}
-                </Button>
-              </form>
-            )}
-
-            {reviews.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Aucun avis pour le moment. Soyez le premier !</p>
-            ) : (
-              <div className="rounded-xl border border-border bg-card px-5">
-                {reviews.map(r => (
-                  <ReviewItem key={r.id} review={r} onDelete={deleteReview} currentUserId={user?.id} isModerator={isModerator} />
-                ))}
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}

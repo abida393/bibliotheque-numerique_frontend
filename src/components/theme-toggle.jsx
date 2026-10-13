@@ -1,31 +1,35 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Moon, Sun } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useEffect, useState } from "react";
+import { Moon, Sun } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function ThemeToggle({ className }) {
-  const [isDark, setIsDark] = useState(false)
-
-  useEffect(() => {
-    const root = document.documentElement
-    const savedTheme = localStorage.getItem('theme')
+  const [isDark, setIsDark] = useState(() => {
+    const root = document.documentElement;
+    const savedTheme = localStorage.getItem("theme");
     const prefersDark = window.matchMedia(
       "(prefers-color-scheme: dark)",
-    ).matches
-    const dark = savedTheme === 'dark' || (savedTheme === null && (root.classList.contains("dark") || prefersDark))
-    setIsDark(dark)
-    root.classList.toggle("dark", dark)
-    root.classList.toggle("light", !dark)
-  }, [])
+    ).matches;
+    return (
+      savedTheme === "dark" ||
+      (savedTheme === null && (root.classList.contains("dark") || prefersDark))
+    );
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle("dark", isDark);
+    root.classList.toggle("light", !isDark);
+  }, [isDark]);
 
   function toggle() {
-    const root = document.documentElement
-    const next = !isDark
-    setIsDark(next)
-    root.classList.toggle("dark", next)
-    root.classList.toggle("light", !next)
-    localStorage.setItem('theme', next ? 'dark' : 'light')
+    const root = document.documentElement;
+    const next = !isDark;
+    setIsDark(next);
+    root.classList.toggle("dark", next);
+    root.classList.toggle("light", !next);
+    localStorage.setItem("theme", next ? "dark" : "light");
   }
 
   return (
@@ -45,5 +49,5 @@ export function ThemeToggle({ className }) {
         <Moon className="size-4.5" aria-hidden="true" />
       )}
     </button>
-  )
+  );
 }
